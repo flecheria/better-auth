@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { WebCryptoPassword, createMachineToken } from "./optimized-auth";
+import { WebCryptoPassword, createMachineToken } from "../src/optimized-auth";
 
 describe("WebCryptoPassword", () => {
     it("should hash and verify a password", async () => {

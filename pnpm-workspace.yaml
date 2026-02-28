@@ -4,6 +4,7 @@ packages:
   - demo/*
   - e2e/**
   - test
+  - pieces
 
 blockExoticSubdeps: true
 

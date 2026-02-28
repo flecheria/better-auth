@@ -1,7 +1,10 @@
 import { eq } from "drizzle-orm";
-import type { Session, User } from "./types";
-import { type BetterAuthOptions } from "@better-auth/core";
-import { parseCookies } from "./cookies";
+// import { type BetterAuthOptions } from "@better-auth/core"; // Removed, not needed for pure logic implementation
+// Removed parseCookies import as it might be problematic if not in core/utils, we can implement it if needed, or just let user provide tokens
+
+// Fake types to replace local imports
+type Session = any;
+type User = any;
 
 /**
  * optimized-auth.ts
@@ -92,6 +95,16 @@ export const WebCryptoPassword = {
         return result === 0;
     }
 };
+
+// --- Helper parseCookies ---
+export function parseCookies(header: string) {
+    const cookies = new Map<string, string>();
+    header.split(';').forEach(cookie => {
+        const parts = cookie.split('=');
+        cookies.set(parts[0].trim(), parts[1] ? parts.slice(1).join('=').trim() : '');
+    });
+    return cookies;
+}
 
 // --- 2. Optimized Auth Functions ---
 
