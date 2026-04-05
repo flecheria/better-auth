@@ -1,5 +1,3 @@
-import { base64Url, base64 } from "@better-auth/utils/base64";
-
 /**
  * optimized-sso.ts
  *
@@ -9,6 +7,18 @@ import { base64Url, base64 } from "@better-auth/utils/base64";
  * system, allowing you to generate authorization URLs, validate codes, and
  * fetch user profiles (focusing on Google and Microsoft Entra ID).
  */
+
+function encodeBase64(buffer: Uint8Array): string {
+    let binary = '';
+    for (let i = 0; i < buffer.byteLength; i++) {
+        binary += String.fromCharCode(buffer[i]);
+    }
+    return btoa(binary);
+}
+
+function encodeBase64Url(buffer: Uint8Array): string {
+    return encodeBase64(buffer).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
 
 export interface OAuthProviderOptions {
     clientId: string;
@@ -34,7 +44,7 @@ export async function generateCodeChallenge(codeVerifier: string): Promise<strin
     const encoder = new TextEncoder();
     const data = encoder.encode(codeVerifier);
     const hash = await crypto.subtle.digest("SHA-256", data);
-    return base64Url.encode(new Uint8Array(hash), { padding: false });
+    return encodeBase64Url(new Uint8Array(hash));
 }
 
 export async function createOAuth2AuthorizationUrl(
@@ -126,7 +136,7 @@ export async function validateOAuth2AuthorizationCode(
     }
 
     if (authentication === "basic" && options.clientSecret) {
-        const encodedCredentials = base64.encode(`${options.clientId}:${options.clientSecret}`);
+        const encodedCredentials = btoa(`${options.clientId}:${options.clientSecret}`);
         headers["Authorization"] = `Basic ${encodedCredentials}`;
     } else {
         body.set("client_id", options.clientId);
@@ -264,7 +274,7 @@ export async function getMicrosoftUserInfo(tokens: OAuth2Tokens, profilePhotoSiz
 
         if (res.ok) {
             const buffer = await res.arrayBuffer();
-            const base64Pic = base64.encode(new Uint8Array(buffer));
+            const base64Pic = encodeBase64(new Uint8Array(buffer));
             pictureUrl = `data:image/jpeg;base64, ${base64Pic}`;
         }
     } catch (e) {
